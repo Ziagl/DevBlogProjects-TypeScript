@@ -50,3 +50,4 @@ var rogue;
         input.Input = Input;
     })(input = rogue.input || (rogue.input = {}));
 })(rogue || (rogue = {}));
+//# sourceMappingURL=input.js.map

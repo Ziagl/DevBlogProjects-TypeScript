@@ -52,3 +52,4 @@ var rogue;
     }());
     rogue.Game = Game;
 })(rogue || (rogue = {}));
+//# sourceMappingURL=game.js.map

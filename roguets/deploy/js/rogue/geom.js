@@ -44,3 +44,4 @@ var rogue;
         geom.Rectangle = Rectangle;
     })(geom = rogue.geom || (rogue.geom = {}));
 })(rogue || (rogue = {}));
+//# sourceMappingURL=geom.js.map

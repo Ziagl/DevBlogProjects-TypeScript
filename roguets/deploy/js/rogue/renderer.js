@@ -54,3 +54,4 @@ var rogue;
         renderer.CanvasMapRenderer = CanvasMapRenderer;
     })(renderer = rogue.renderer || (rogue.renderer = {}));
 })(rogue || (rogue = {}));
+//# sourceMappingURL=renderer.js.map

@@ -27,3 +27,4 @@ var rogue;
         map.TileMap = TileMap;
     })(map = rogue.map || (rogue.map = {}));
 })(rogue || (rogue = {}));
+//# sourceMappingURL=map.js.map
