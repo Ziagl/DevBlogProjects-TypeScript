@@ -1,4 +1,4 @@
-module webglEngine
+namespace webglEngine
 {
     /**
      * global WebGL rendering context

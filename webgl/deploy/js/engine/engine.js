@@ -1,19 +1,21 @@
 "use strict";
 var webglEngine;
 (function (webglEngine) {
-    var Game = /** @class */ (function () {
+    var Engine = /** @class */ (function () {
         /**
          * initialize engine with canvas element
          * @param display
          */
-        function Game() {
+        function Engine() {
             this._canvas = webglEngine.GLUtilities.initialize();
+            this._shader = this.loadShaders();
+            this._shader.use();
             webglEngine.gl.clearColor(0, 0, 0, 1);
         }
         /**
          * starts game loop
          */
-        Game.prototype.start = function () {
+        Engine.prototype.start = function () {
             var _this = this;
             // Create and start the game loop
             var gameloop = function () {
@@ -22,20 +24,25 @@ var webglEngine;
             };
             gameloop();
         };
-        Game.prototype.resize = function () {
+        Engine.prototype.resize = function () {
             if (this._canvas !== undefined) {
                 this._canvas.width = window.innerWidth;
                 this._canvas.height = window.innerHeight;
             }
         };
-        Game.prototype.update = function () {
+        Engine.prototype.update = function () {
             // logic that decides if we need to redraw canvas
             this.draw();
         };
-        Game.prototype.draw = function () {
+        Engine.prototype.draw = function () {
             webglEngine.gl.clear(webglEngine.gl.COLOR_BUFFER_BIT);
         };
-        return Game;
+        Engine.prototype.loadShaders = function () {
+            var vertexShaderSource = "\nattribute vec3 a_position;\n\nvoid main() \n{\n    gl_Position = vec4(a_position, 1.0);\n}";
+            var fragmentShaderSource = "\nprecision mediump float;\n\nvoid main()\n{\n    gl_FragColor = vec4(1.0);\n}\n";
+            return new webglEngine.Shader("basic", vertexShaderSource, fragmentShaderSource);
+        };
+        return Engine;
     }());
-    webglEngine.Game = Game;
+    webglEngine.Engine = Engine;
 })(webglEngine || (webglEngine = {}));

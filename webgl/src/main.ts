@@ -1,8 +1,8 @@
-var engine: webglEngine.Game;
+var engine: webglEngine.Engine;
 
 // entry point of application
 window.onload = () => {
-    engine = new webglEngine.Game();
+    engine = new webglEngine.Engine();
     engine.start();
 };
 
