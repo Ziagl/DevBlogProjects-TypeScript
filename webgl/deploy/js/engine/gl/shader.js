@@ -12,10 +12,15 @@ var webglEngine;
          * @param fragmentSource the source of the fragment shader
          */
         function Shader(name, vertexSource, fragmentSource) {
+            // key-value store
+            this._attributes = {};
+            this._uniforms = {};
             this._name = name;
             var vertexShader = this.loadShader(vertexSource, webglEngine.gl.VERTEX_SHADER);
             var fragmentShader = this.loadShader(fragmentSource, webglEngine.gl.FRAGMENT_SHADER);
             this._program = this.createProgram(vertexShader, fragmentShader);
+            this.detectAttributes();
+            this.detectUniforms();
         }
         Object.defineProperty(Shader.prototype, "name", {
             /**
@@ -32,6 +37,26 @@ var webglEngine;
          */
         Shader.prototype.use = function () {
             webglEngine.gl.useProgram(this._program);
+        };
+        /**
+         * gets the location of an attribute with the provided name
+         * @param name name of attribute to retrieve
+         */
+        Shader.prototype.getAttributeLocation = function (name) {
+            if (this._attributes[name] === undefined) {
+                throw new Error("Unable to find attribute name '" + name + "' in shader named" + this._name);
+            }
+            return this._attributes[name];
+        };
+        /**
+         * gets the location of an uniform with the provided name
+         * @param name name of uniform to retrieve
+         */
+        Shader.prototype.getUniformLocation = function (name) {
+            if (this._uniforms[name] === undefined) {
+                throw new Error("Unable to find uniform name '" + name + "' in shader named" + this._name);
+            }
+            return this._uniforms[name];
         };
         Shader.prototype.loadShader = function (source, shaderType) {
             var shader = webglEngine.gl.createShader(shaderType);
@@ -53,6 +78,29 @@ var webglEngine;
                 throw new Error("Error linking shader '" + this._name + "': " + error);
             }
             return program;
+        };
+        /**
+         * gets all attributes from shader
+         */
+        Shader.prototype.detectAttributes = function () {
+            var attributeCount = webglEngine.gl.getProgramParameter(this._program, webglEngine.gl.ACTIVE_ATTRIBUTES);
+            for (var i = 0; i < attributeCount; ++i) {
+                var info = webglEngine.gl.getActiveAttrib(this._program, i);
+                if (!info) {
+                    break;
+                }
+                this._attributes[info.name] = webglEngine.gl.getAttribLocation(this._program, info.name);
+            }
+        };
+        Shader.prototype.detectUniforms = function () {
+            var uniformCount = webglEngine.gl.getProgramParameter(this._program, webglEngine.gl.ACTIVE_UNIFORMS);
+            for (var i = 0; i < uniformCount; ++i) {
+                var info = webglEngine.gl.getActiveUniform(this._program, i);
+                if (!info) {
+                    break;
+                }
+                this._uniforms[info.name] = webglEngine.gl.getUniformLocation(this._program, info.name);
+            }
         };
         return Shader;
     }());

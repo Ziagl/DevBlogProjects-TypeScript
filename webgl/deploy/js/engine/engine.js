@@ -39,31 +39,35 @@ var webglEngine;
         };
         Engine.prototype.draw = function () {
             webglEngine.gl.clear(webglEngine.gl.COLOR_BUFFER_BIT);
-            // draw buffer
-            webglEngine.gl.bindBuffer(webglEngine.gl.ARRAY_BUFFER, this._buffer);
-            webglEngine.gl.vertexAttribPointer(0, 3, webglEngine.gl.FLOAT, false, 0, 0);
-            webglEngine.gl.enableVertexAttribArray(0);
-            webglEngine.gl.drawArrays(webglEngine.gl.TRIANGLES, 0, 3);
+            // set uniforms
+            var colorPosition = this._shader.getUniformLocation("u_color");
+            webglEngine.gl.uniform4f(colorPosition, 1, 0.5, 0, 1);
+            this._buffer.bind();
+            this._buffer.draw();
         };
         Engine.prototype.createBuffer = function () {
-            var buffer = webglEngine.gl.createBuffer();
+            var buffer = new webglEngine.GLBuffer(3);
+            // add attributes
+            var positionAttribute = new webglEngine.AttributeInfo();
+            positionAttribute.location = this._shader.getAttributeLocation("a_position");
+            positionAttribute.offset = 0;
+            positionAttribute.size = 3; // x, y, z
+            buffer.addAttributeLocation(positionAttribute);
+            // add vertex data
             var vertices = [
                 // x y z
                 -0.5, -0.5, 0,
                 0.5, -0.5, 0,
                 0, 0.5, 0
             ];
-            webglEngine.gl.bindBuffer(webglEngine.gl.ARRAY_BUFFER, buffer);
-            webglEngine.gl.vertexAttribPointer(0, 3, webglEngine.gl.FLOAT, false, 0, 0);
-            webglEngine.gl.enableVertexAttribArray(0);
-            webglEngine.gl.bufferData(webglEngine.gl.ARRAY_BUFFER, new Float32Array(vertices), webglEngine.gl.STATIC_DRAW);
-            webglEngine.gl.bindBuffer(webglEngine.gl.ARRAY_BUFFER, null);
-            webglEngine.gl.disableVertexAttribArray(0);
+            buffer.pushBackData(vertices);
+            buffer.upload();
+            buffer.unbind();
             return buffer;
         };
         Engine.prototype.loadShaders = function () {
             var vertexShaderSource = "\nattribute vec3 a_position;\n\nvoid main() \n{\n    gl_Position = vec4(a_position, 1.0);\n}";
-            var fragmentShaderSource = "\nprecision mediump float;\n\nvoid main()\n{\n    gl_FragColor = vec4(1.0);\n}\n";
+            var fragmentShaderSource = "\nprecision mediump float;\n\nuniform vec4 u_color;\n\nvoid main()\n{\n    gl_FragColor = u_color;\n}\n";
             return new webglEngine.Shader("basic", vertexShaderSource, fragmentShaderSource);
         };
         return Engine;
