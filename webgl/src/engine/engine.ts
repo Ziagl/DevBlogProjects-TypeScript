@@ -4,7 +4,9 @@ namespace webglEngine
     {
         private _canvas:HTMLCanvasElement;
         private _shader:Shader;
-        private _buffer:GLBuffer;
+        private _projection:Matrix4x4;
+
+        private _sprite:Sprite;
 
         /**
          * initialize engine with canvas element
@@ -15,7 +17,9 @@ namespace webglEngine
             this._canvas = GLUtilities.initialize();
             this._shader = this.loadShaders();
             this._shader.use();
-            this._buffer = this.createBuffer();
+            this._projection = Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
+            this._sprite = new Sprite("test");
+            this._sprite.position.x = 200;
 
             gl.clearColor(0,0,0,1);
         }
@@ -41,7 +45,7 @@ namespace webglEngine
                 this._canvas.width = window.innerWidth;
                 this._canvas.height = window.innerHeight;
 
-                gl.viewport(0,0,this._canvas.width, this._canvas.height);
+                gl.viewport(-1, 1, -1, 1);
             }
         }
 
@@ -58,34 +62,12 @@ namespace webglEngine
             // set uniforms
             let colorPosition = this._shader.getUniformLocation("u_color");
             gl.uniform4f(colorPosition, 1, 0.5, 0, 1);
+            let projectionPosition = this._shader.getUniformLocation("u_projection");
+            gl.uniformMatrix4fv(projectionPosition, false, new Float32Array(this._projection.data));
+            let modelLocation = this._shader.getUniformLocation("u_model");
+            gl.uniformMatrix4fv(modelLocation, false, new Float32Array(Matrix4x4.translation(this._sprite.position).data));
 
-            this._buffer.bind();
-            this._buffer.draw();
-        }
-
-        private createBuffer():GLBuffer
-        {
-            let buffer:GLBuffer = new GLBuffer(3);
-
-            // add attributes
-            let positionAttribute = new AttributeInfo();
-            positionAttribute.location = this._shader.getAttributeLocation("a_position");
-            positionAttribute.offset = 0;
-            positionAttribute.size = 3; // x, y, z
-            buffer.addAttributeLocation(positionAttribute);
-
-            // add vertex data
-            let vertices = [
-                // x y z
-                -0.5, -0.5, 0,
-                0.5, -0.5, 0,
-                0, 0.5, 0
-            ];
-            buffer.pushBackData(vertices);
-            buffer.upload();
-            buffer.unbind();
-
-            return buffer;
+            this._sprite.draw();
         }
 
         private loadShaders():Shader
@@ -93,9 +75,12 @@ namespace webglEngine
             let vertexShaderSource = `
 attribute vec3 a_position;
 
+uniform mat4 u_projection;
+uniform mat4 u_model;
+
 void main() 
 {
-    gl_Position = vec4(a_position, 1.0);
+    gl_Position = u_projection * u_model * vec4(a_position, 1.0);
 }`;
             let fragmentShaderSource = `
 precision mediump float;
