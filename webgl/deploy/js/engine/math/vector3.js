@@ -1,7 +1,16 @@
 "use strict";
 var webglEngine;
 (function (webglEngine) {
+    /**
+     * this represents a vector in 3d space
+     */
     var Vector3 = /** @class */ (function () {
+        /**
+         * creates new vector with given coordinates
+         * @param x the x coordinate
+         * @param y the y coordinate
+         * @param z the z coordinate
+         */
         function Vector3(x, y, z) {
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
@@ -40,9 +49,15 @@ var webglEngine;
             enumerable: false,
             configurable: true
         });
+        /**
+         * converts this vector into an array of numbers
+         */
         Vector3.prototype.toArray = function () {
             return [this._x, this._y, this._z];
         };
+        /**
+         * converts this vector into a Float32Array
+         */
         Vector3.prototype.toFloat32Array = function () {
             return new Float32Array(this.toArray());
         };

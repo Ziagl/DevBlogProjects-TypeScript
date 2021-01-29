@@ -1,9 +1,15 @@
 namespace webglEngine
 {
+    /**
+     * this represents a 4 by 4 matrix
+     */
     export class Matrix4x4
     {
         private _data:number[] = [];
 
+        /**
+         * constructor is private so you can not create your own matrix
+         */
         private constructor()
         {
             this._data = [
@@ -19,11 +25,23 @@ namespace webglEngine
             return this._data;
         }
 
+        /**
+         * this creates an identity matrix
+         */
         public static identity():Matrix4x4
         {
             return new Matrix4x4;
         }
 
+        /**
+         * this creates an orthographic matrix for orthographic projection
+         * @param left the left border
+         * @param right the right border
+         * @param bottom the bottom border
+         * @param top the top border
+         * @param nearClip the near clipping range
+         * @param farClip the far clipping range
+         */
         public static orthographic(left:number, right:number, bottom:number, top:number, nearClip:number, farClip:number):Matrix4x4
         {
             let m = new Matrix4x4();
@@ -42,6 +60,10 @@ namespace webglEngine
             return m;
         }
 
+        /**
+         * creates a translation matrix from a given position as Vector3
+         * @param position position in 3d space
+         */
         public static translation(position:Vector3):Matrix4x4
         {
             let m = new Matrix4x4();
