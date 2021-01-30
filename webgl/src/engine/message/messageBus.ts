@@ -1,5 +1,8 @@
 namespace webglEngine
 {
+    /**
+     * the message manager responsible for sending message across the system
+     */
     export class MessageBus
     {
         private static _subscriptions:{[code:string]:IMessageHandler[]} = {};
@@ -11,9 +14,14 @@ namespace webglEngine
 
         }
 
+        /**
+         * adds a subscription to the provided code using the provided handler.
+         * @param code the code to listen for
+         * @param handler the handler to be subscribed.
+         */
         public static addSubscription(code:string, handler:IMessageHandler):void
         {
-            if(MessageBus._subscriptions[code] !== undefined)
+            if(MessageBus._subscriptions[code] === undefined)
             {
                 MessageBus._subscriptions[code] = [];
             }
@@ -26,6 +34,11 @@ namespace webglEngine
             }
         }
 
+        /**
+         * removed a subscription to the provided code using the provided handler
+         * @param code the cod eto no longer listen for
+         * @param handler the handler to be unsubscribed
+         */
         public static removeSubscription(code:string, handler:IMessageHandler):void
         {
             if(MessageBus._subscriptions[code] === undefined)
@@ -41,6 +54,10 @@ namespace webglEngine
             }
         }
 
+        /**
+         * posts the provided message to the message system
+         * @param message the message to be sent
+         */
         public static post(message:Message):void
         {
             console.log("Message posted: ",message);
@@ -61,6 +78,9 @@ namespace webglEngine
             }
         }
 
+        /**
+         * updated messages and computes up do normalQueueMessagePerUpdate messages
+         */
         public static update(time:number):void
         {
             if(MessageBus._normalMessageQueue.length === 0)

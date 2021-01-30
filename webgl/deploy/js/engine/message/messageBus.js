@@ -1,11 +1,19 @@
 "use strict";
 var webglEngine;
 (function (webglEngine) {
+    /**
+     * the message manager responsible for sending message across the system
+     */
     var MessageBus = /** @class */ (function () {
         function MessageBus() {
         }
+        /**
+         * adds a subscription to the provided code using the provided handler.
+         * @param code the code to listen for
+         * @param handler the handler to be subscribed.
+         */
         MessageBus.addSubscription = function (code, handler) {
-            if (MessageBus._subscriptions[code] !== undefined) {
+            if (MessageBus._subscriptions[code] === undefined) {
                 MessageBus._subscriptions[code] = [];
             }
             if (MessageBus._subscriptions[code].indexOf(handler) !== -1) {
@@ -15,6 +23,11 @@ var webglEngine;
                 MessageBus._subscriptions[code].push(handler);
             }
         };
+        /**
+         * removed a subscription to the provided code using the provided handler
+         * @param code the cod eto no longer listen for
+         * @param handler the handler to be unsubscribed
+         */
         MessageBus.removeSubscription = function (code, handler) {
             if (MessageBus._subscriptions[code] === undefined) {
                 console.warn("Cannot unsubscribe handler from code: " + code + ". That code is not subscribed to.");
@@ -25,6 +38,10 @@ var webglEngine;
                 MessageBus._subscriptions[code].splice(nodeIndex, 1);
             }
         };
+        /**
+         * posts the provided message to the message system
+         * @param message the message to be sent
+         */
         MessageBus.post = function (message) {
             console.log("Message posted: ", message);
             var handlers = MessageBus._subscriptions[message.code];
@@ -41,6 +58,9 @@ var webglEngine;
                 }
             }
         };
+        /**
+         * updated messages and computes up do normalQueueMessagePerUpdate messages
+         */
         MessageBus.update = function (time) {
             if (MessageBus._normalMessageQueue.length === 0) {
                 return;
