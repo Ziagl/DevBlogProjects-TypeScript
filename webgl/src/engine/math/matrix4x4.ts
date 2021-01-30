@@ -76,6 +76,44 @@ namespace webglEngine
         }
 
         /**
+         * creates a rotation matrix for x axis from given angle
+         * @param angleInRadians the angle in radians
+         */
+        public static rotationX(angleInRadians:number):Matrix4x4
+        {
+            let m = new Matrix4x4();
+
+            let c = Math.cos(angleInRadians);
+            let s = Math.sin(angleInRadians);
+            
+            m._data[5] = c;
+            m._data[6] = s;
+            m._data[9] = -s;
+            m._data[10] = c;
+
+            return m;
+        }
+
+        /**
+         * creates a rotation matrix for y axis from given angle
+         * @param angleInRadians the angle in radians
+         */
+        public static rotationY(angleInRadians:number):Matrix4x4
+        {
+            let m = new Matrix4x4();
+
+            let c = Math.cos(angleInRadians);
+            let s = Math.sin(angleInRadians);
+            
+            m._data[0] = c;
+            m._data[2] = -s;
+            m._data[8] = s;
+            m._data[10] = c;
+
+            return m;
+        }
+
+        /**
          * creates a rotation matrix for z axis from given angle
          * @param angleInRadians the angle in radians
          */
@@ -88,10 +126,26 @@ namespace webglEngine
             
             m._data[0] = c;
             m._data[1] = s;
-            m._data[5] = -s;
-            m._data[6] = c;
+            m._data[4] = -s;
+            m._data[5] = c;
 
             return m;
+        }
+
+        /**
+         * creates a rotation matrix for all axis
+         * @param xRadians the angle in radians for x axis
+         * @param yRadians the angle in radians for y axis
+         * @param zRadians the angle in radians for z axis
+         */
+        public static rotationXYZ(xRadians:number, yRadians:number, zRadians:number):Matrix4x4
+        {
+            let rx = Matrix4x4.rotationX(xRadians);
+            let ry = Matrix4x4.rotationY(yRadians);
+            let rz = Matrix4x4.rotationZ(zRadians);
+
+            // ZYX
+            return Matrix4x4.multiply(Matrix4x4.multiply(rz, ry), rx);
         }
 
         /**
@@ -177,6 +231,18 @@ namespace webglEngine
         public toFloat32Array():Float32Array
         {
             return new Float32Array(this._data);
+        }
+
+        /**
+         * copy given matrix value by value
+         * @param m matrix to copy
+         */
+        public copyFrom(m:Matrix4x4):void
+        {
+            for(let i=0; i<16; ++i)
+            {
+                this._data[i] = m._data[i];
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ namespace webglEngine
         private _parent:SimObject;
         private _isLoaded:boolean = false;
         private _scene:Scene;
+        private _components:BaseComponent[] = [];
 
         private _localMatrix:Matrix4x4 = Matrix4x4.identity();
         private _worldMatrix:Matrix4x4 = Matrix4x4.identity();
@@ -89,9 +90,20 @@ namespace webglEngine
             return undefined;
         }
 
+        public addComponent(component:BaseComponent):void
+        {
+            this._components.push(component);
+            component.setOwner(this);
+        }
+
         public load():void
         {
             this._isLoaded = true;
+
+            for(let c of this._components)
+            {
+                c.load();
+            }
 
             for(let c of this._children)
             {
@@ -101,6 +113,15 @@ namespace webglEngine
 
         public update(time:number):void
         {
+            //TODO only do if there was a change!!!
+            this._localMatrix = this.transform.getTransformationMatrix();
+            this.updateWorldMatrix((this._parent !== undefined)?this._parent.worldMatrix:undefined );
+
+            for(let c of this._components)
+            {
+                c.update(time);
+            }
+
             for(let c of this._children)
             {
                 c.update(time);
@@ -109,6 +130,11 @@ namespace webglEngine
 
         public render(shader:Shader):void
         {
+            for(let c of this._components)
+            {
+                c.render(shader);
+            }
+
             for(let c of this._children)
             {
                 c.render(shader);
@@ -118,6 +144,16 @@ namespace webglEngine
         protected onAdded(scene:Scene):void
         {
             this._scene = scene;
+        }
+
+        private updateWorldMatrix(parentWorldMatrix:Matrix4x4):void
+        {
+            if(parentWorldMatrix !== undefined)
+            {
+                this._worldMatrix = Matrix4x4.multiply(parentWorldMatrix, this._localMatrix);
+            } else {
+                this._worldMatrix.copyFrom(this._localMatrix);
+            }
         }
     }
 }

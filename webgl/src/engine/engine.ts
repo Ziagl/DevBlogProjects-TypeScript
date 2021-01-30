@@ -6,8 +6,6 @@ namespace webglEngine
         private _basicShader:BasicShader;
         private _projection:Matrix4x4;
 
-        private _sprite:Sprite;
-
         /**
          * initialize engine with canvas element
          * @param display 
@@ -24,10 +22,10 @@ namespace webglEngine
             // load materials
             MaterialManager.registerMaterial(new Material("smiley", "assets/textures/smiley.png", new Color(255, 128, 0, 255)));
 
+            let zoneID = ZoneManager.createTestZone();
+            
             this._projection = Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
-            this._sprite = new Sprite("test", "smiley");
-            this._sprite.position.x = 200;
-            this._sprite.position.y = 100;
+            ZoneManager.changeZone(zoneID);
 
             gl.clearColor(0,0,0,1);
         }
@@ -61,6 +59,7 @@ namespace webglEngine
         private update():void
         {
             MessageBus.update(0);
+            ZoneManager.update(0);
             // logic that decides if we need to redraw canvas
             this.draw();
         }
@@ -69,11 +68,11 @@ namespace webglEngine
         {
             gl.clear(gl.COLOR_BUFFER_BIT);
 
+            ZoneManager.render(this._basicShader);
+
             // set uniforms
             let projectionPosition = this._basicShader.getUniformLocation("u_projection");
             gl.uniformMatrix4fv(projectionPosition, false, new Float32Array(this._projection.data));
-
-            this._sprite.draw(this._basicShader);
         }
     }
 }

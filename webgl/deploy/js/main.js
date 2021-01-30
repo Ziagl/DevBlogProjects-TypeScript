@@ -28,10 +28,9 @@ var webglEngine;
             this._basicShader = new webglEngine.BasicShader();
             this._basicShader.use();
             webglEngine.MaterialManager.registerMaterial(new webglEngine.Material("smiley", "assets/textures/smiley.png", new webglEngine.Color(255, 128, 0, 255)));
+            var zoneID = webglEngine.ZoneManager.createTestZone();
             this._projection = webglEngine.Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
-            this._sprite = new webglEngine.Sprite("test", "smiley");
-            this._sprite.position.x = 200;
-            this._sprite.position.y = 100;
+            webglEngine.ZoneManager.changeZone(zoneID);
             webglEngine.gl.clearColor(0, 0, 0, 1);
         }
         Engine.prototype.start = function () {
@@ -53,13 +52,14 @@ var webglEngine;
         };
         Engine.prototype.update = function () {
             webglEngine.MessageBus.update(0);
+            webglEngine.ZoneManager.update(0);
             this.draw();
         };
         Engine.prototype.draw = function () {
             webglEngine.gl.clear(webglEngine.gl.COLOR_BUFFER_BIT);
+            webglEngine.ZoneManager.render(this._basicShader);
             var projectionPosition = this._basicShader.getUniformLocation("u_projection");
             webglEngine.gl.uniformMatrix4fv(projectionPosition, false, new Float32Array(this._projection.data));
-            this._sprite.draw(this._basicShader);
         };
         return Engine;
     }());
@@ -162,6 +162,52 @@ var webglEngine;
         return ImageAssetLoader;
     }());
     webglEngine.ImageAssetLoader = ImageAssetLoader;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var BaseComponent = (function () {
+        function BaseComponent(name) {
+            this.name = name;
+        }
+        Object.defineProperty(BaseComponent.prototype, "owner", {
+            get: function () {
+                return this._owner;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        BaseComponent.prototype.setOwner = function (owner) {
+            this._owner = owner;
+        };
+        BaseComponent.prototype.load = function () {
+        };
+        BaseComponent.prototype.update = function (time) {
+        };
+        BaseComponent.prototype.render = function (shader) {
+        };
+        return BaseComponent;
+    }());
+    webglEngine.BaseComponent = BaseComponent;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var SpriteComponent = (function (_super) {
+        __extends(SpriteComponent, _super);
+        function SpriteComponent(name, materialName) {
+            var _this = _super.call(this, name) || this;
+            _this._sprite = new webglEngine.Sprite(name, materialName);
+            return _this;
+        }
+        SpriteComponent.prototype.load = function () {
+            this._sprite.load();
+        };
+        SpriteComponent.prototype.render = function (shader) {
+            this._sprite.draw(shader, this._owner.worldMatrix);
+            _super.prototype.render.call(this, shader);
+        };
+        return SpriteComponent;
+    }(webglEngine.BaseComponent));
+    webglEngine.SpriteComponent = SpriteComponent;
 })(webglEngine || (webglEngine = {}));
 var webglEngine;
 (function (webglEngine) {
@@ -622,7 +668,6 @@ var webglEngine;
         function Sprite(name, materialName, width, height) {
             if (width === void 0) { width = 100; }
             if (height === void 0) { height = 100; }
-            this.position = new webglEngine.Vector3();
             this._name = name;
             this._width = width;
             this._height = height;
@@ -670,9 +715,9 @@ var webglEngine;
         };
         Sprite.prototype.update = function (time) {
         };
-        Sprite.prototype.draw = function (shader) {
+        Sprite.prototype.draw = function (shader, model) {
             var modelLocation = shader.getUniformLocation("u_model");
-            webglEngine.gl.uniformMatrix4fv(modelLocation, false, new Float32Array(webglEngine.Matrix4x4.translation(this.position).data));
+            webglEngine.gl.uniformMatrix4fv(modelLocation, false, model.toFloat32Array());
             var colorLocation = shader.getUniformLocation("u_tint");
             webglEngine.gl.uniform4fv(colorLocation, this._material.tint.toFloat32Array());
             if (this._material.diffuseTexture !== undefined) {
@@ -862,15 +907,41 @@ var webglEngine;
             m._data[14] = position.z;
             return m;
         };
+        Matrix4x4.rotationX = function (angleInRadians) {
+            var m = new Matrix4x4();
+            var c = Math.cos(angleInRadians);
+            var s = Math.sin(angleInRadians);
+            m._data[5] = c;
+            m._data[6] = s;
+            m._data[9] = -s;
+            m._data[10] = c;
+            return m;
+        };
+        Matrix4x4.rotationY = function (angleInRadians) {
+            var m = new Matrix4x4();
+            var c = Math.cos(angleInRadians);
+            var s = Math.sin(angleInRadians);
+            m._data[0] = c;
+            m._data[2] = -s;
+            m._data[8] = s;
+            m._data[10] = c;
+            return m;
+        };
         Matrix4x4.rotationZ = function (angleInRadians) {
             var m = new Matrix4x4();
             var c = Math.cos(angleInRadians);
             var s = Math.sin(angleInRadians);
             m._data[0] = c;
             m._data[1] = s;
-            m._data[5] = -s;
-            m._data[6] = c;
+            m._data[4] = -s;
+            m._data[5] = c;
             return m;
+        };
+        Matrix4x4.rotationXYZ = function (xRadians, yRadians, zRadians) {
+            var rx = Matrix4x4.rotationX(xRadians);
+            var ry = Matrix4x4.rotationY(yRadians);
+            var rz = Matrix4x4.rotationZ(zRadians);
+            return Matrix4x4.multiply(Matrix4x4.multiply(rz, ry), rx);
         };
         Matrix4x4.scale = function (scale) {
             var m = new Matrix4x4();
@@ -934,6 +1005,11 @@ var webglEngine;
         Matrix4x4.prototype.toFloat32Array = function () {
             return new Float32Array(this._data);
         };
+        Matrix4x4.prototype.copyFrom = function (m) {
+            for (var i = 0; i < 16; ++i) {
+                this._data[i] = m._data[i];
+            }
+        };
         return Matrix4x4;
     }());
     webglEngine.Matrix4x4 = Matrix4x4;
@@ -953,7 +1029,7 @@ var webglEngine;
         };
         Transform.prototype.getTransformationMatrix = function () {
             var translation = webglEngine.Matrix4x4.translation(this.position);
-            var rotation = webglEngine.Matrix4x4.rotationZ(this.rotation.z);
+            var rotation = webglEngine.Matrix4x4.rotationXYZ(this.rotation.x, this.rotation.y, this.rotation.z);
             var scale = webglEngine.Matrix4x4.scale(this.scale);
             return webglEngine.Matrix4x4.multiply(webglEngine.Matrix4x4.multiply(translation, rotation), scale);
         };
@@ -1173,6 +1249,106 @@ var webglEngine;
 })(webglEngine || (webglEngine = {}));
 var webglEngine;
 (function (webglEngine) {
+    var ZoneState;
+    (function (ZoneState) {
+        ZoneState[ZoneState["UNINITIALIZED"] = 0] = "UNINITIALIZED";
+        ZoneState[ZoneState["LOADING"] = 1] = "LOADING";
+        ZoneState[ZoneState["UPDATING"] = 2] = "UPDATING";
+    })(ZoneState = webglEngine.ZoneState || (webglEngine.ZoneState = {}));
+    var Zone = (function () {
+        function Zone(id, name, description) {
+            this._state = ZoneState.UNINITIALIZED;
+            this._id = id;
+            this._name = name;
+            this._description = description;
+            this._scene = new webglEngine.Scene();
+        }
+        Object.defineProperty(Zone.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Zone.prototype, "name", {
+            get: function () {
+                return this._name;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Zone.prototype, "description", {
+            get: function () {
+                return this._description;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Zone.prototype, "scene", {
+            get: function () {
+                return this._scene;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Zone.prototype.load = function () {
+            this._state = ZoneState.LOADING;
+            this._scene.load();
+            this._state = ZoneState.UPDATING;
+        };
+        Zone.prototype.unload = function () {
+        };
+        Zone.prototype.update = function (time) {
+            if (this._state === ZoneState.UPDATING) {
+                this._scene.update(time);
+            }
+        };
+        Zone.prototype.render = function (shader) {
+            if (this._state === ZoneState.UPDATING) {
+                this._scene.render(shader);
+            }
+        };
+        Zone.prototype.onActivated = function () {
+        };
+        Zone.prototype.onDeactivated = function () {
+        };
+        return Zone;
+    }());
+    webglEngine.Zone = Zone;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var TestZone = (function (_super) {
+        __extends(TestZone, _super);
+        function TestZone() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TestZone.prototype.load = function () {
+            this._parentObject = new webglEngine.SimObject(0, "parentObject");
+            this._parentObject.transform.position.x = 300;
+            this._parentObject.transform.position.y = 300;
+            this._parentSprite = new webglEngine.SpriteComponent("test", "smiley");
+            this._parentObject.addComponent(this._parentSprite);
+            this._testObject = new webglEngine.SimObject(1, "testObject");
+            this._testSprite = new webglEngine.SpriteComponent("test", "smiley");
+            this._testObject.addComponent(this._testSprite);
+            this._testObject.transform.position.x = 120;
+            this._testObject.transform.position.y = 120;
+            this._parentObject.addChild(this._testObject);
+            this.scene.addObject(this._parentObject);
+            _super.prototype.load.call(this);
+        };
+        TestZone.prototype.update = function (time) {
+            this._parentObject.transform.rotation.z += 0.01;
+            this._testObject.transform.rotation.z += 0.01;
+            _super.prototype.update.call(this, time);
+        };
+        return TestZone;
+    }(webglEngine.Zone));
+    webglEngine.TestZone = TestZone;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
     var Scene = (function () {
         function Scene() {
             this._root = new webglEngine.SimObject(0, "__ROOT__", this);
@@ -1216,6 +1392,7 @@ var webglEngine;
         function SimObject(id, name, scene) {
             this._children = [];
             this._isLoaded = false;
+            this._components = [];
             this._localMatrix = webglEngine.Matrix4x4.identity();
             this._worldMatrix = webglEngine.Matrix4x4.identity();
             this.transform = new webglEngine.Transform();
@@ -1276,29 +1453,99 @@ var webglEngine;
             }
             return undefined;
         };
+        SimObject.prototype.addComponent = function (component) {
+            this._components.push(component);
+            component.setOwner(this);
+        };
         SimObject.prototype.load = function () {
             this._isLoaded = true;
-            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+            for (var _i = 0, _a = this._components; _i < _a.length; _i++) {
                 var c = _a[_i];
+                c.load();
+            }
+            for (var _b = 0, _c = this._children; _b < _c.length; _b++) {
+                var c = _c[_b];
                 c.load();
             }
         };
         SimObject.prototype.update = function (time) {
-            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+            this._localMatrix = this.transform.getTransformationMatrix();
+            this.updateWorldMatrix((this._parent !== undefined) ? this._parent.worldMatrix : undefined);
+            for (var _i = 0, _a = this._components; _i < _a.length; _i++) {
                 var c = _a[_i];
+                c.update(time);
+            }
+            for (var _b = 0, _c = this._children; _b < _c.length; _b++) {
+                var c = _c[_b];
                 c.update(time);
             }
         };
         SimObject.prototype.render = function (shader) {
-            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+            for (var _i = 0, _a = this._components; _i < _a.length; _i++) {
                 var c = _a[_i];
+                c.render(shader);
+            }
+            for (var _b = 0, _c = this._children; _b < _c.length; _b++) {
+                var c = _c[_b];
                 c.render(shader);
             }
         };
         SimObject.prototype.onAdded = function (scene) {
             this._scene = scene;
         };
+        SimObject.prototype.updateWorldMatrix = function (parentWorldMatrix) {
+            if (parentWorldMatrix !== undefined) {
+                this._worldMatrix = webglEngine.Matrix4x4.multiply(parentWorldMatrix, this._localMatrix);
+            }
+            else {
+                this._worldMatrix.copyFrom(this._localMatrix);
+            }
+        };
         return SimObject;
     }());
     webglEngine.SimObject = SimObject;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var ZoneManager = (function () {
+        function ZoneManager() {
+        }
+        ZoneManager.createZone = function (name, description) {
+            ZoneManager._globalZoneID++;
+            var zone = new webglEngine.Zone(ZoneManager._globalZoneID, name, description);
+            ZoneManager._zones[ZoneManager._globalZoneID] = zone;
+            return ZoneManager._globalZoneID;
+        };
+        ZoneManager.createTestZone = function () {
+            ZoneManager._globalZoneID++;
+            var zone = new webglEngine.TestZone(ZoneManager._globalZoneID, "test", "simple test zone");
+            ZoneManager._zones[ZoneManager._globalZoneID] = zone;
+            return ZoneManager._globalZoneID;
+        };
+        ZoneManager.changeZone = function (id) {
+            if (ZoneManager._activeZone !== undefined) {
+                ZoneManager._activeZone.onDeactivated();
+                ZoneManager._activeZone.unload();
+            }
+            if (ZoneManager._zones[id] !== undefined) {
+                ZoneManager._activeZone = ZoneManager._zones[id];
+                ZoneManager._activeZone.onActivated();
+                ZoneManager._activeZone.load();
+            }
+        };
+        ZoneManager.update = function (time) {
+            if (ZoneManager._activeZone !== undefined) {
+                ZoneManager._activeZone.update(time);
+            }
+        };
+        ZoneManager.render = function (shader) {
+            if (ZoneManager._activeZone !== undefined) {
+                ZoneManager._activeZone.render(shader);
+            }
+        };
+        ZoneManager._globalZoneID = -1;
+        ZoneManager._zones = {};
+        return ZoneManager;
+    }());
+    webglEngine.ZoneManager = ZoneManager;
 })(webglEngine || (webglEngine = {}));
