@@ -69,13 +69,13 @@ namespace webglEngine
             // add vertex data
             let vertices = [
                 // x y z u v
-                0, 0, 0, 0, 0,
-                this._width, 0, 0, 1.0, 0,
-                0, this._height, 0, 0, 1.0,
+                0, 0, 0, 0, 1.0,
+                this._width, 0, 0, 1.0, 1.0,
+                0, this._height, 0, 0, 0,
 
-                0, this._height, 0, 0, 1.0,
-                this._width, 0, 0, 1.0, 0,
-                this._width, this._height, 0, 1.0, 1.0
+                0, this._height, 0, 0, 0,
+                this._width, 0, 0, 1.0, 1.00,
+                this._width, this._height, 0, 1.0, 0
             ];
             buffer.pushBackData(vertices);
             buffer.upload();
