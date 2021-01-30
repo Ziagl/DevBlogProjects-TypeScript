@@ -298,7 +298,7 @@ var webglEngine;
                 var it = _a[_i];
                 webglEngine.gl.disableVertexAttribArray(it.location);
             }
-            webglEngine.gl.bindBuffer(this._targetBufferType, this._buffer);
+            webglEngine.gl.bindBuffer(this._targetBufferType, undefined);
         };
         GLBuffer.prototype.addAttributeLocation = function (info) {
             this._hasAttributeLocation = true;
@@ -1549,3 +1549,4 @@ var webglEngine;
     }());
     webglEngine.ZoneManager = ZoneManager;
 })(webglEngine || (webglEngine = {}));
+//# sourceMappingURL=main.js.map

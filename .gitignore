@@ -1,0 +1,6 @@
+# ignore generated JavaScript files
+*.js
+*.map.js
+
+# ignore TypeScript definition files
+*.d.ts

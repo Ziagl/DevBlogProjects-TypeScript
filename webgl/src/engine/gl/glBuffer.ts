@@ -104,7 +104,7 @@ namespace webglEngine
             {
                 gl.disableVertexAttribArray(it.location);
             }
-            gl.bindBuffer(this._targetBufferType, this._buffer);
+            gl.bindBuffer(this._targetBufferType, undefined);
         }
 
         /**
