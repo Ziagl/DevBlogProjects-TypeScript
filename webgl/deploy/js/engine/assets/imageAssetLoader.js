@@ -1,4 +1,3 @@
-"use strict";
 var webglEngine;
 (function (webglEngine) {
     var ImageAsset = /** @class */ (function () {

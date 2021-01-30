@@ -1,4 +1,3 @@
-"use strict";
 var webglEngine;
 (function (webglEngine) {
     /**
@@ -8,11 +7,11 @@ var webglEngine;
         /**
          * creates a new sprite
          * @param name the name of this sprite
-         * @param textureName the name of the texture to use with this sprite
+         * @param materialName the name of the material to use with this sprite
          * @param width the width of this sprite
          * @param height the height of this sprite
          */
-        function Sprite(name, textureName, width, height) {
+        function Sprite(name, materialName, width, height) {
             if (width === void 0) { width = 100; }
             if (height === void 0) { height = 100; }
             /**
@@ -23,8 +22,8 @@ var webglEngine;
             this._width = width;
             this._height = height;
             this._buffer = this.load();
-            this._textureName = textureName;
-            this._texture = webglEngine.TextureManager.getTexture(textureName);
+            this._materialName = materialName;
+            this._material = webglEngine.MaterialManager.getMaterial(this._materialName);
         }
         Object.defineProperty(Sprite.prototype, "name", {
             get: function () {
@@ -35,7 +34,9 @@ var webglEngine;
         });
         Sprite.prototype.destroy = function () {
             this._buffer.destroy();
-            webglEngine.TextureManager.releaseTexture(this._textureName);
+            webglEngine.MaterialManager.releaseMaterial(this._materialName);
+            this._material = undefined;
+            this._materialName = undefined;
         };
         /**
          * performs loading routines on this sprite
@@ -78,9 +79,15 @@ var webglEngine;
          * draws this sprite
          */
         Sprite.prototype.draw = function (shader) {
-            this._texture.activateAndBind(0);
-            var diffuseLocation = shader.getUniformLocation("u_diffuse");
-            webglEngine.gl.uniform1i(diffuseLocation, 0);
+            var modelLocation = shader.getUniformLocation("u_model");
+            webglEngine.gl.uniformMatrix4fv(modelLocation, false, new Float32Array(webglEngine.Matrix4x4.translation(this.position).data));
+            var colorLocation = shader.getUniformLocation("u_tint");
+            webglEngine.gl.uniform4fv(colorLocation, this._material.tint.toFloat32Array());
+            if (this._material.diffuseTexture !== undefined) {
+                this._material.diffuseTexture.activateAndBind(0);
+                var diffuseLocation = shader.getUniformLocation("u_diffuse");
+                webglEngine.gl.uniform1i(diffuseLocation, 0);
+            }
             this._buffer.bind();
             this._buffer.draw();
         };

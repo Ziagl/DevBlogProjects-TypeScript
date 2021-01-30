@@ -1,4 +1,3 @@
-"use strict";
 var webglEngine;
 (function (webglEngine) {
     var Engine = /** @class */ (function () {
@@ -9,11 +8,15 @@ var webglEngine;
         function Engine() {
             this._canvas = webglEngine.GLUtilities.initialize();
             webglEngine.AssetManager.initialize();
-            this._shader = this.loadShaders();
-            this._shader.use();
+            // load shader
+            this._basicShader = new webglEngine.BasicShader();
+            this._basicShader.use();
+            // load materials
+            webglEngine.MaterialManager.registerMaterial(new webglEngine.Material("smiley", "assets/textures/smiley.png", new webglEngine.Color(255, 128, 0, 255)));
             this._projection = webglEngine.Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
-            this._sprite = new webglEngine.Sprite("test", "assets/textures/smiley.png");
+            this._sprite = new webglEngine.Sprite("test", "smiley");
             this._sprite.position.x = 200;
+            this._sprite.position.y = 100;
             webglEngine.gl.clearColor(0, 0, 0, 1);
         }
         /**
@@ -33,30 +36,21 @@ var webglEngine;
             if (this._canvas !== undefined) {
                 this._canvas.width = window.innerWidth;
                 this._canvas.height = window.innerHeight;
-                webglEngine.gl.viewport(-1, 1, -1, 1);
+                webglEngine.gl.viewport(0, 0, webglEngine.gl.canvas.width, webglEngine.gl.canvas.height);
+                this._projection = webglEngine.Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
             }
         };
         Engine.prototype.update = function () {
+            webglEngine.MessageBus.update(0);
             // logic that decides if we need to redraw canvas
             this.draw();
         };
         Engine.prototype.draw = function () {
-            webglEngine.MessageBus.update(0);
             webglEngine.gl.clear(webglEngine.gl.COLOR_BUFFER_BIT);
             // set uniforms
-            var colorPosition = this._shader.getUniformLocation("u_tint");
-            //gl.uniform4f(colorPosition, 1, 0.5, 0, 1);
-            webglEngine.gl.uniform4f(colorPosition, 1, 1, 1, 1);
-            var projectionPosition = this._shader.getUniformLocation("u_projection");
+            var projectionPosition = this._basicShader.getUniformLocation("u_projection");
             webglEngine.gl.uniformMatrix4fv(projectionPosition, false, new Float32Array(this._projection.data));
-            var modelLocation = this._shader.getUniformLocation("u_model");
-            webglEngine.gl.uniformMatrix4fv(modelLocation, false, new Float32Array(webglEngine.Matrix4x4.translation(this._sprite.position).data));
-            this._sprite.draw(this._shader);
-        };
-        Engine.prototype.loadShaders = function () {
-            var vertexShaderSource = "\nattribute vec3 a_position;\nattribute vec2 a_texCoord;\n\nuniform mat4 u_projection;\nuniform mat4 u_model;\n\nvarying vec2 v_texCoord;\n\nvoid main() \n{\n    gl_Position = u_projection * u_model * vec4(a_position, 1.0);\n    v_texCoord = a_texCoord;\n}";
-            var fragmentShaderSource = "\nprecision mediump float;\n\nuniform vec4 u_tint;\nuniform sampler2D u_diffuse;\n\nvarying vec2 v_texCoord;\n\nvoid main()\n{\n    gl_FragColor = u_tint * texture2D(u_diffuse, v_texCoord);\n}\n";
-            return new webglEngine.Shader("basic", vertexShaderSource, fragmentShaderSource);
+            this._sprite.draw(this._basicShader);
         };
         return Engine;
     }());

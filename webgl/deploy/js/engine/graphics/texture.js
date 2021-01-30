@@ -1,4 +1,3 @@
-"use strict";
 var webglEngine;
 (function (webglEngine) {
     var LEVEL = 0;

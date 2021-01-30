@@ -1,4 +1,3 @@
-"use strict";
 var engine;
 // entry point of application
 window.onload = function () {

@@ -1,4 +1,3 @@
-"use strict";
 var webglEngine;
 (function (webglEngine) {
     webglEngine.MESSAGE_ASSET_LOADER_ASSET_LOADED = "MESSAGE_ASSET_LOADER_ASSET_LOADED::";

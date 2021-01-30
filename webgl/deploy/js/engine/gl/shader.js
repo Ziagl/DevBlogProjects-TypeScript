@@ -1,4 +1,3 @@
-"use strict";
 var webglEngine;
 (function (webglEngine) {
     /**
@@ -8,19 +7,12 @@ var webglEngine;
         /**
          * creates a new shader
          * @param name the name of this shader
-         * @param vertexSource the source of the vertex shader
-         * @param fragmentSource the source of the fragment shader
          */
-        function Shader(name, vertexSource, fragmentSource) {
+        function Shader(name) {
             // key-value store
             this._attributes = {};
             this._uniforms = {};
             this._name = name;
-            var vertexShader = this.loadShader(vertexSource, webglEngine.gl.VERTEX_SHADER);
-            var fragmentShader = this.loadShader(fragmentSource, webglEngine.gl.FRAGMENT_SHADER);
-            this._program = this.createProgram(vertexShader, fragmentShader);
-            this.detectAttributes();
-            this.detectUniforms();
         }
         Object.defineProperty(Shader.prototype, "name", {
             /**
@@ -57,6 +49,18 @@ var webglEngine;
                 throw new Error("Unable to find uniform name '" + name + "' in shader named" + this._name);
             }
             return this._uniforms[name];
+        };
+        /**
+         * loads shaders from given sources
+         * @param vertexSource the vertex shader source
+         * @param fragmentSource the fragment shader source
+         */
+        Shader.prototype.load = function (vertexSource, fragmentSource) {
+            var vertexShader = this.loadShader(vertexSource, webglEngine.gl.VERTEX_SHADER);
+            var fragmentShader = this.loadShader(fragmentSource, webglEngine.gl.FRAGMENT_SHADER);
+            this._program = this.createProgram(vertexShader, fragmentShader);
+            this.detectAttributes();
+            this.detectUniforms();
         };
         Shader.prototype.loadShader = function (source, shaderType) {
             var shader = webglEngine.gl.createShader(shaderType);

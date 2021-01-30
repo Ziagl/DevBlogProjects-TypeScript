@@ -3,7 +3,7 @@ namespace webglEngine
     /**
      * represents a WebGL shader
      */
-    export class Shader
+    export abstract class Shader
     {
         private _name:string;
         private _program:WebGLProgram;
@@ -14,19 +14,10 @@ namespace webglEngine
         /**
          * creates a new shader
          * @param name the name of this shader
-         * @param vertexSource the source of the vertex shader
-         * @param fragmentSource the source of the fragment shader
          */
-        constructor(name:string, vertexSource:string, fragmentSource:string)
+        constructor(name:string)
         {
             this._name = name;
-            let vertexShader = this.loadShader(vertexSource, gl.VERTEX_SHADER);
-            let fragmentShader = this.loadShader(fragmentSource, gl.FRAGMENT_SHADER);
-
-            this._program = this.createProgram(vertexShader, fragmentShader);
-            
-            this.detectAttributes();
-            this.detectUniforms();
         }
 
         /**
@@ -69,6 +60,22 @@ namespace webglEngine
                 throw new Error("Unable to find uniform name '" +name+ "' in shader named"+this._name);
             }
             return this._uniforms[name];
+        }
+
+        /**
+         * loads shaders from given sources
+         * @param vertexSource the vertex shader source
+         * @param fragmentSource the fragment shader source
+         */
+        protected load(vertexSource:string, fragmentSource:string):void
+        {
+            let vertexShader = this.loadShader(vertexSource, gl.VERTEX_SHADER);
+            let fragmentShader = this.loadShader(fragmentSource, gl.FRAGMENT_SHADER);
+
+            this._program = this.createProgram(vertexShader, fragmentShader);
+            
+            this.detectAttributes();
+            this.detectUniforms();
         }
 
         private loadShader(source:string, shaderType:number):WebGLShader
