@@ -1,0 +1,34 @@
+namespace webglEngine
+{
+    export class Transform
+    {
+        public position:Vector3 = Vector3.zero;
+        public rotation:Vector3 = Vector3.zero;
+        public scale:Vector3 = Vector3.one;
+
+        /**
+         * copies given transform value by value
+         * @param transform transform to be copied
+         */
+        public copyFrom(transform:Transform):void
+        {
+            this.position.copyFrom(transform.position);
+            this.rotation.copyFrom(transform.rotation);
+            this.scale.copyFrom(transform.scale);
+        }
+
+        /**
+         * gets transformation matrix
+         */
+        public getTransformationMatrix():Matrix4x4
+        {
+            let translation = Matrix4x4.translation(this.position);
+            // TODO: add x and y for 3D!
+            let rotation = Matrix4x4.rotationZ(this.rotation.z);
+            let scale = Matrix4x4.scale(this.scale);
+
+            // Translation * Rotation * Scale
+            return Matrix4x4.multiply(Matrix4x4.multiply(translation, rotation), scale);
+        }
+    }
+}

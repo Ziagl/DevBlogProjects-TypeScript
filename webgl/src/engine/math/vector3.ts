@@ -53,6 +53,22 @@ namespace webglEngine
         }
 
         /**
+         * returns a vector with all zero
+         */
+        public static get zero():Vector3
+        {
+            return new Vector3();
+        }
+
+        /**
+         * returns a vector with all one
+         */
+        public static get one():Vector3
+        {
+            return new Vector3(1,1,1);
+        }
+
+        /**
          * converts this vector into an array of numbers
          */
         public toArray():number[]
@@ -66,6 +82,17 @@ namespace webglEngine
         public toFloat32Array():Float32Array
         {
             return new Float32Array(this.toArray());
+        }
+
+        /**
+         * copies given vector value by value
+         * @param vector vector to be copied
+         */
+        public copyFrom(vector:Vector3):void
+        {
+            this._x = vector.x;
+            this._y = vector.y;
+            this._z = vector.z;
         }
     }
 }

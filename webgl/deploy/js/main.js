@@ -862,9 +862,104 @@ var webglEngine;
             m._data[14] = position.z;
             return m;
         };
+        Matrix4x4.rotationZ = function (angleInRadians) {
+            var m = new Matrix4x4();
+            var c = Math.cos(angleInRadians);
+            var s = Math.sin(angleInRadians);
+            m._data[0] = c;
+            m._data[1] = s;
+            m._data[5] = -s;
+            m._data[6] = c;
+            return m;
+        };
+        Matrix4x4.scale = function (scale) {
+            var m = new Matrix4x4();
+            m._data[0] = scale.x;
+            m._data[5] = scale.y;
+            m._data[10] = scale.z;
+            return m;
+        };
+        Matrix4x4.multiply = function (a, b) {
+            var m = new Matrix4x4();
+            var b00 = b._data[0 * 4 + 0];
+            var b01 = b._data[0 * 4 + 1];
+            var b02 = b._data[0 * 4 + 2];
+            var b03 = b._data[0 * 4 + 3];
+            var b10 = b._data[1 * 4 + 0];
+            var b11 = b._data[1 * 4 + 1];
+            var b12 = b._data[1 * 4 + 2];
+            var b13 = b._data[1 * 4 + 3];
+            var b20 = b._data[2 * 4 + 0];
+            var b21 = b._data[2 * 4 + 1];
+            var b22 = b._data[2 * 4 + 2];
+            var b23 = b._data[2 * 4 + 3];
+            var b30 = b._data[3 * 4 + 0];
+            var b31 = b._data[3 * 4 + 1];
+            var b32 = b._data[3 * 4 + 2];
+            var b33 = b._data[3 * 4 + 3];
+            var a00 = a._data[0 * 4 + 0];
+            var a01 = a._data[0 * 4 + 1];
+            var a02 = a._data[0 * 4 + 2];
+            var a03 = a._data[0 * 4 + 3];
+            var a10 = a._data[1 * 4 + 0];
+            var a11 = a._data[1 * 4 + 1];
+            var a12 = a._data[1 * 4 + 2];
+            var a13 = a._data[1 * 4 + 3];
+            var a20 = a._data[2 * 4 + 0];
+            var a21 = a._data[2 * 4 + 1];
+            var a22 = a._data[2 * 4 + 2];
+            var a23 = a._data[2 * 4 + 3];
+            var a30 = a._data[3 * 4 + 0];
+            var a31 = a._data[3 * 4 + 1];
+            var a32 = a._data[3 * 4 + 2];
+            var a33 = a._data[3 * 4 + 3];
+            m._data[0] = b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30;
+            m._data[1] = b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31;
+            m._data[2] = b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32;
+            m._data[3] = b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33;
+            m._data[4] = b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30;
+            m._data[5] = b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31;
+            m._data[6] = b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32;
+            m._data[7] = b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33;
+            m._data[8] = b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30;
+            m._data[9] = b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31;
+            m._data[10] = b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32;
+            m._data[11] = b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33;
+            m._data[12] = b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30;
+            m._data[13] = b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31;
+            m._data[14] = b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32;
+            m._data[15] = b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33;
+            return m;
+        };
+        Matrix4x4.prototype.toFloat32Array = function () {
+            return new Float32Array(this._data);
+        };
         return Matrix4x4;
     }());
     webglEngine.Matrix4x4 = Matrix4x4;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var Transform = (function () {
+        function Transform() {
+            this.position = webglEngine.Vector3.zero;
+            this.rotation = webglEngine.Vector3.zero;
+            this.scale = webglEngine.Vector3.one;
+        }
+        Transform.prototype.copyFrom = function (transform) {
+            this.position.copyFrom(transform.position);
+            this.rotation.copyFrom(transform.rotation);
+            this.scale.copyFrom(transform.scale);
+        };
+        Transform.prototype.getTransformationMatrix = function () {
+            var translation = webglEngine.Matrix4x4.translation(this.position);
+            var rotation = webglEngine.Matrix4x4.rotationZ(this.rotation.z);
+            var scale = webglEngine.Matrix4x4.scale(this.scale);
+            return webglEngine.Matrix4x4.multiply(webglEngine.Matrix4x4.multiply(translation, rotation), scale);
+        };
+        return Transform;
+    }());
+    webglEngine.Transform = Transform;
 })(webglEngine || (webglEngine = {}));
 var webglEngine;
 (function (webglEngine) {
@@ -946,11 +1041,30 @@ var webglEngine;
             enumerable: false,
             configurable: true
         });
+        Object.defineProperty(Vector3, "zero", {
+            get: function () {
+                return new Vector3();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Vector3, "one", {
+            get: function () {
+                return new Vector3(1, 1, 1);
+            },
+            enumerable: false,
+            configurable: true
+        });
         Vector3.prototype.toArray = function () {
             return [this._x, this._y, this._z];
         };
         Vector3.prototype.toFloat32Array = function () {
             return new Float32Array(this.toArray());
+        };
+        Vector3.prototype.copyFrom = function (vector) {
+            this._x = vector.x;
+            this._y = vector.y;
+            this._z = vector.z;
         };
         return Vector3;
     }());
@@ -1056,4 +1170,135 @@ var webglEngine;
         return MessageSubscriptionNode;
     }());
     webglEngine.MessageSubscriptionNode = MessageSubscriptionNode;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var Scene = (function () {
+        function Scene() {
+            this._root = new webglEngine.SimObject(0, "__ROOT__", this);
+        }
+        Object.defineProperty(Scene.prototype, "root", {
+            get: function () {
+                return this._root;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Scene.prototype, "isLoaded", {
+            get: function () {
+                return this._root.isLoaded;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Scene.prototype.addObject = function (object) {
+            this._root.addChild(object);
+        };
+        Scene.prototype.getObjectByName = function (name) {
+            return this._root.getObjectByName(name);
+        };
+        Scene.prototype.load = function () {
+            this._root.load();
+        };
+        Scene.prototype.update = function (time) {
+            this._root.update(time);
+        };
+        Scene.prototype.render = function (shader) {
+            this._root.render(shader);
+        };
+        return Scene;
+    }());
+    webglEngine.Scene = Scene;
+})(webglEngine || (webglEngine = {}));
+var webglEngine;
+(function (webglEngine) {
+    var SimObject = (function () {
+        function SimObject(id, name, scene) {
+            this._children = [];
+            this._isLoaded = false;
+            this._localMatrix = webglEngine.Matrix4x4.identity();
+            this._worldMatrix = webglEngine.Matrix4x4.identity();
+            this.transform = new webglEngine.Transform();
+            this._id = id;
+            this.name = name;
+            this._scene = scene;
+        }
+        Object.defineProperty(SimObject.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(SimObject.prototype, "parent", {
+            get: function () {
+                return this._parent;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(SimObject.prototype, "worldMatrix", {
+            get: function () {
+                return this._worldMatrix;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(SimObject.prototype, "isLoaded", {
+            get: function () {
+                return this._isLoaded;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        SimObject.prototype.addChild = function (child) {
+            child._parent = this;
+            this._children.push(child);
+            child.onAdded(this._scene);
+        };
+        SimObject.prototype.removeChild = function (child) {
+            var index = this._children.indexOf(child);
+            if (index !== -1) {
+                child._parent = undefined;
+                this._children.splice(index, 1);
+            }
+        };
+        SimObject.prototype.getObjectByName = function (name) {
+            if (this.name === name) {
+                return this;
+            }
+            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+                var child = _a[_i];
+                var result = child.getObjectByName(name);
+                if (result !== undefined) {
+                    return result;
+                }
+            }
+            return undefined;
+        };
+        SimObject.prototype.load = function () {
+            this._isLoaded = true;
+            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+                var c = _a[_i];
+                c.load();
+            }
+        };
+        SimObject.prototype.update = function (time) {
+            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+                var c = _a[_i];
+                c.update(time);
+            }
+        };
+        SimObject.prototype.render = function (shader) {
+            for (var _i = 0, _a = this._children; _i < _a.length; _i++) {
+                var c = _a[_i];
+                c.render(shader);
+            }
+        };
+        SimObject.prototype.onAdded = function (scene) {
+            this._scene = scene;
+        };
+        return SimObject;
+    }());
+    webglEngine.SimObject = SimObject;
 })(webglEngine || (webglEngine = {}));
