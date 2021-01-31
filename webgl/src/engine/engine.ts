@@ -14,6 +14,7 @@ namespace webglEngine
         {
             this._canvas = GLUtilities.initialize();
             AssetManager.initialize();
+            ZoneManager.initialize();
 
             // load shader
             this._basicShader = new BasicShader();
@@ -22,10 +23,10 @@ namespace webglEngine
             // load materials
             MaterialManager.registerMaterial(new Material("smiley", "assets/textures/smiley.png", new Color(255, 128, 0, 255)));
 
-            let zoneID = ZoneManager.createTestZone();
-            
             this._projection = Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
-            ZoneManager.changeZone(zoneID);
+            
+            // todo: should be read from configuration later
+            ZoneManager.changeZone(0);
 
             gl.clearColor(0,0,0,1);
         }

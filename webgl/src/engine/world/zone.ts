@@ -14,6 +14,7 @@ namespace webglEngine
         private _description:string;
         private _scene:Scene;
         private _state:ZoneState = ZoneState.UNINITIALIZED;
+        private _globalID:number = -1;
 
         constructor(id:number, name:string, description:string)
         {
@@ -43,6 +44,21 @@ namespace webglEngine
             return this._scene;
         }
 
+        public initialize(zoneData:any):void
+        {
+            if(zoneData.object === undefined)
+            {
+                throw new Error("Zone initialization error: objects not present.");
+            }
+
+            for(let o in zoneData.objects)
+            {
+                let obj = zoneData.objects[o];
+                
+                this.loadSimObjet(obj, this._scene.root);
+            }
+        }
+
         public load():void
         {
             this._state = ZoneState.LOADING;
@@ -52,7 +68,7 @@ namespace webglEngine
 
         public unload():void
         {
-            
+
         }
 
         public update(time:number):void
@@ -73,12 +89,43 @@ namespace webglEngine
 
         public onActivated():void
         {
-
+            
         }
 
         public onDeactivated():void
         {
 
+        }
+
+        private loadSimObjet(dataSection:any, parent:SimObject):void
+        {
+            let name:string;
+            if(dataSection.name !== undefined)
+            {
+                name = String(dataSection.name);
+            }
+
+            this._globalID++;
+            let simObject = new SimObject(this._globalID, name, this._scene);
+
+            if(dataSection.transform !== undefined)
+            {
+                simObject.transform.setFromJson(dataSection.transform);
+            }
+
+            if(dataSection.children !== undefined)
+            {
+                for(let o in dataSection.children)
+                {
+                    let obj = dataSection.children[o];
+                    this.loadSimObjet(obj, simObject);
+                }
+            }
+
+            if(parent !== undefined)
+            {
+                parent.addChild(simObject)
+            }
         }
     }
 }
