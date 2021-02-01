@@ -48,18 +48,16 @@ namespace webglEngine
          */
         public load():GLBuffer
         {
-            let buffer:GLBuffer = new GLBuffer(5);
+            let buffer:GLBuffer = new GLBuffer();
 
             // add attributes
             let positionAttribute = new AttributeInfo();
             positionAttribute.location = 0;
-            positionAttribute.offset = 0;
             positionAttribute.size = 3; // x, y, z
             buffer.addAttributeLocation(positionAttribute);
 
             let texCoordAttribute = new AttributeInfo();
             texCoordAttribute.location = 1;
-            texCoordAttribute.offset = 3;
             texCoordAttribute.size = 2; // u, v
             buffer.addAttributeLocation(texCoordAttribute);
 

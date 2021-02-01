@@ -21,7 +21,7 @@ namespace webglEngine
             this._basicShader.use();
 
             // load materials
-            MaterialManager.registerMaterial(new Material("smiley", "assets/textures/smiley.png", new Color(255, 128, 0, 255)));
+            MaterialManager.registerMaterial(new Material("smiley", "assets/textures/smiley.png", Color.white()));
 
             this._projection = Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
             

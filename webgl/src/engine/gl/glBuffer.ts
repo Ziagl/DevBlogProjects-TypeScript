@@ -37,10 +37,10 @@ namespace webglEngine
          * @param targetBufferType the buffer target type. gl.ARRAY_BUFFER or gl.ELEMENT_ARRAY_BUFFER. Default: gl.ARRAY_BUFFER
          * @param mode the drawing mode of this buffer (i.e. gl.TRIANGLES or gl.LINES). Default gl.TRIANGLES
          */
-        constructor(elementSize:number, dataType:number = gl.FLOAT, 
+        constructor(dataType:number = gl.FLOAT, 
                     targetBufferType:number = gl.ARRAY_BUFFER, mode:number = gl.TRIANGLES)
         {
-            this._elementSize = elementSize;
+            this._elementSize = 0;
             this._dataType = dataType;
             this._targetBufferType = targetBufferType;
             this._mode = mode;
@@ -65,7 +65,6 @@ namespace webglEngine
                     throw new Error("Unrecognized data type: " + this._dataType.toString());
             }
 
-            this._stride = this._elementSize * this._typeSize;
             this._buffer = <WebGLBuffer>gl.createBuffer();
         }
 
@@ -114,7 +113,10 @@ namespace webglEngine
         public addAttributeLocation(info:AttributeInfo):void
         {
             this._hasAttributeLocation = true;
+            info.offset = this._elementSize;
             this._attributes.push(info);
+            this._elementSize+=info.size;
+            this._stride = this._elementSize * this._typeSize;
         }
 
         /**
