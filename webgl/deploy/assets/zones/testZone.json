@@ -26,6 +26,15 @@
                             "materialName":"smiley",
                             "type":"sprite"
                         }
+                    ],
+                    "behaviors":[
+                        {
+                            "name":"rotateX",
+                            "type":"rotation",
+                            "rotation":{
+                                "z":0.01
+                            }
+                        }
                     ]
                 }
             ],
@@ -34,6 +43,15 @@
                     "name":"test",
                     "materialName":"smiley",
                     "type":"sprite"
+                }
+            ],
+            "behaviors":[
+                {
+                    "name":"rotateX",
+                    "type":"rotation",
+                    "rotation":{
+                        "z":0.01
+                    }
                 }
             ]
         }

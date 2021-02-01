@@ -110,5 +110,41 @@ namespace webglEngine
                 this._z = Number(json.z);
             }
         }
+
+        public add(v:Vector3):Vector3
+        {
+            this._x += v._x;
+            this._y += v._y;
+            this._z += v._z;
+
+            return this;
+        }
+
+        public subtract(v:Vector3):Vector3
+        {
+            this._x -= v._x;
+            this._y -= v._y;
+            this._z -= v._z;
+
+            return this;
+        }
+
+        public multiply(v:Vector3):Vector3
+        {
+            this._x *= v._x;
+            this._y *= v._y;
+            this._z *= v._z;
+
+            return this;
+        }
+
+        public devide(v:Vector3):Vector3
+        {
+            this._x /= v._x;
+            this._y /= v._y;
+            this._z /= v._z;
+
+            return this;
+        }
     }
 }
