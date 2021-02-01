@@ -1,4 +1,4 @@
-///<reference path="zone.ts"/>
+/* ///<reference path="zone.ts"/>
 
 namespace webglEngine
 {
@@ -40,4 +40,4 @@ namespace webglEngine
             super.update(time);
         }
     }
-}
+} */

@@ -1,13 +1,15 @@
 namespace webglEngine
 {
-    export abstract class BaseComponent
+    export abstract class BaseComponent implements IComponent
     {
         protected _owner:SimObject;
+        protected _data:IComponentData;
         public name:string;
 
-        constructor(name:string)
+        constructor(data:IComponentData)
         {
-            this.name = name;
+            this._data = data;
+            this.name = data.name;
         }
 
         public get owner():SimObject

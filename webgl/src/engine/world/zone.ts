@@ -46,7 +46,7 @@ namespace webglEngine
 
         public initialize(zoneData:any):void
         {
-            if(zoneData.object === undefined)
+            if(zoneData.objects === undefined)
             {
                 throw new Error("Zone initialization error: objects not present.");
             }
@@ -111,6 +111,16 @@ namespace webglEngine
             if(dataSection.transform !== undefined)
             {
                 simObject.transform.setFromJson(dataSection.transform);
+            }
+
+            if(dataSection.components !== undefined)
+            {
+                for(let c in dataSection.components)
+                {
+                    let data = dataSection.components[c];
+                    let component = ComponentManager.extractComponent(data);
+                    simObject.addComponent(component);
+                }
             }
 
             if(dataSection.children !== undefined)

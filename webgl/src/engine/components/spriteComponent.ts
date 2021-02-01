@@ -1,14 +1,49 @@
+///<reference path="componentManager.ts"/>
+
 namespace webglEngine
 {
+    export class SpriteComponentData implements IComponentData
+    {
+        public name:string;
+        public materialName:string;
+
+        public setFromJson(json:any):void
+        {
+            if(json.name !== undefined)
+            {
+                this.name = String(json.name);
+            }
+            if(json.materialName !== undefined)
+            {
+                this.materialName = String(json.materialName);
+            }
+        }
+    }
+
+    export class SpriteComponentBuilder implements IComponentBuilder
+    {
+        public get type():string
+        {
+            return "sprite";
+        }
+
+        public buildFromJson(json:any):IComponent
+        {
+            let data = new SpriteComponentData();
+            data.setFromJson(json);
+            return new SpriteComponent(data);
+        }
+    }
+
     export class SpriteComponent extends BaseComponent
     {
         private _sprite:Sprite;
 
-        constructor(name:string, materialName:string)
+        constructor(data:SpriteComponentData)
         {
-            super(name);
+            super(data);
 
-            this._sprite = new Sprite(name, materialName);
+            this._sprite = new Sprite(data.name, data.materialName);
         }
 
         public load():void
@@ -22,4 +57,6 @@ namespace webglEngine
             super.render(shader);
         }
     }
+
+    ComponentManager.registerBuilder(new SpriteComponentBuilder());
 }
