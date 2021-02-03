@@ -1,4 +1,5 @@
 ///<reference path="componentManager.ts"/>
+///<reference path="baseComponent.ts"/>
 
 namespace webglEngine
 {

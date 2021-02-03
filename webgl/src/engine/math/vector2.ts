@@ -40,6 +40,32 @@ namespace webglEngine
         }
 
         /**
+         * returns a vector with all zero
+         */
+        public static get zero():Vector2
+        {
+            return new Vector2();
+        }
+
+         /**
+         * returns a vector with all one
+         */
+        public static get one():Vector2
+        {
+            return new Vector2(1,1);
+        }
+
+        /**
+         * set data from another Vector2
+         * @param v Vector to be copied
+         */
+        public copyFrom(v:Vector2):void
+        {
+            this._x = v.x;
+            this._y = v.y;
+        }
+
+        /**
          * converts this vector into an array of numbers
          */
         public toArray():number[]

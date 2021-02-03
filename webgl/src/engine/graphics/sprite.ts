@@ -5,13 +5,14 @@ namespace webglEngine
      */
     export class Sprite
     {
-        private _name:string;
-        private _width:number;
-        private _height:number;
+        protected _name:string;
+        protected _width:number;
+        protected _height:number;
 
-        private _buffer:GLBuffer;
-        private _materialName:string;
-        private _material:Material;
+        protected _buffer:GLBuffer;
+        protected _materialName:string;
+        protected _material:Material;
+        protected _vertices:Vertex[] = [];
 
         /**
          * creates a new sprite
@@ -25,7 +26,7 @@ namespace webglEngine
             this._name = name;
             this._width = width;
             this._height = height;
-            this._buffer = this.load();
+            this.load();
             this._materialName = materialName;
             this._material = MaterialManager.getMaterial(this._materialName);
         }
@@ -46,37 +47,39 @@ namespace webglEngine
         /**
          * performs loading routines on this sprite
          */
-        public load():GLBuffer
+        public load():void
         {
-            let buffer:GLBuffer = new GLBuffer();
+            this._buffer = new GLBuffer();
 
             // add attributes
             let positionAttribute = new AttributeInfo();
             positionAttribute.location = 0;
             positionAttribute.size = 3; // x, y, z
-            buffer.addAttributeLocation(positionAttribute);
+            this._buffer.addAttributeLocation(positionAttribute);
 
             let texCoordAttribute = new AttributeInfo();
             texCoordAttribute.location = 1;
             texCoordAttribute.size = 2; // u, v
-            buffer.addAttributeLocation(texCoordAttribute);
+            this._buffer.addAttributeLocation(texCoordAttribute);
 
             // add vertex data
-            let vertices = [
+            this._vertices = [
                 // x y z u v
-                0, 0, 0, 0, 1.0,
-                this._width, 0, 0, 1.0, 1.0,
-                0, this._height, 0, 0, 0,
+                new Vertex(0, 0, 0, 0, 1.0),
+                new Vertex(this._width, 0, 0, 1.0, 1.0),
+                new Vertex(0, this._height, 0, 0, 0),
 
-                0, this._height, 0, 0, 0,
-                this._width, 0, 0, 1.0, 1.00,
-                this._width, this._height, 0, 1.0, 0
+                new Vertex(0, this._height, 0, 0, 0),
+                new Vertex(this._width, 0, 0, 1.0, 1.0),
+                new Vertex(this._width, this._height, 0, 1.0, 0)
             ];
-            buffer.pushBackData(vertices);
-            buffer.upload();
-            buffer.unbind();
 
-            return buffer;
+            for(let v of this._vertices)
+            {
+                this._buffer.pushBackData(v.toArray());
+            }
+            this._buffer.upload();
+            this._buffer.unbind();
         }
 
         /**

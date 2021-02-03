@@ -5,6 +5,7 @@ namespace webglEngine
         private _canvas:HTMLCanvasElement;
         private _basicShader:BasicShader;
         private _projection:Matrix4x4;
+        private _previousTime:number = 0;
 
         /**
          * initialize engine with canvas element
@@ -22,6 +23,7 @@ namespace webglEngine
 
             // load materials
             MaterialManager.registerMaterial(new Material("smiley", "assets/textures/smiley.png", Color.white()));
+            MaterialManager.registerMaterial(new Material("running", "assets/textures/running.png", Color.white()));
 
             this._projection = Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
             
@@ -29,6 +31,10 @@ namespace webglEngine
             ZoneManager.changeZone(0);
 
             gl.clearColor(0,0,0,1);
+            
+            // enable transparancy
+            gl.enable(gl.BLEND);    
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
 
         /**
@@ -59,8 +65,11 @@ namespace webglEngine
 
         private update():void
         {
-            MessageBus.update(0);
-            ZoneManager.update(0);
+            let delta = performance.now() - this._previousTime;
+            MessageBus.update(delta);
+            ZoneManager.update(delta);
+            this._previousTime = performance.now();
+
             // logic that decides if we need to redraw canvas
             this.draw();
         }

@@ -120,6 +120,16 @@ namespace webglEngine
         }
 
         /**
+         * replaces current data in this buffer
+         * @param data the data to be loaded in this buffer
+         */
+        public setData(data:number[]):void
+        {
+            this.clearData();
+            this.pushBackData(data);
+        }
+
+        /**
          * adds data to this buffer
          * @param data
          */
@@ -129,6 +139,14 @@ namespace webglEngine
             {
                 this._data.push(d);
             }
+        }
+
+        /**
+         * clears out all data in this buffer
+         */
+        public clearData():void
+        {
+            this._data.length = 0;
         }
 
         /**
