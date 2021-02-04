@@ -130,7 +130,7 @@ namespace webglEngine
             let yValue:number = 0;
             for(let i=0; i<this._frameCount;++i)
             {
-                totalWidth += i * this._frameWidth;
+                totalWidth = i * this._frameWidth;
                 if(totalWidth > this._assetWidth)
                 {
                     yValue++;
@@ -142,7 +142,7 @@ namespace webglEngine
                 let min:Vector2 = new Vector2(u,v);
 
                 let uMax = ((i * this._frameWidth) + this._frameWidth) / this._assetWidth;
-                let vMax = ((yValue * this._frameHeight) + this._frameHeight)/ this._assetHeight;
+                let vMax = ((yValue * this._frameHeight) + this._frameHeight) / this._assetHeight;
                 let max:Vector2 = new Vector2(uMax,vMax);
 
                 this._frameUVs.push(new UVInfo(min,max));
