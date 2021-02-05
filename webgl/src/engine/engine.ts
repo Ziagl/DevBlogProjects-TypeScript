@@ -28,6 +28,8 @@ namespace webglEngine
             MaterialManager.registerMaterial(new Material("smiley", "assets/textures/smiley.png", Color.white()));
             MaterialManager.registerMaterial(new Material("running", "assets/textures/running.png", Color.white()));
 
+            AudioManager.loadSoundFile("laugh", "assets/sounds/laugh.mp3");
+
             this._projection = Matrix4x4.orthographic(0, this._canvas.width, 0, this._canvas.height, -1.0, 100.0);
             
             // todo: should be read from configuration later
@@ -46,6 +48,8 @@ namespace webglEngine
             {
                 let context = message.context as MouseContext;
                 document.title = `Pos: [${context.position.x},${context.position.y}]`
+
+                AudioManager.playSound("laugh");
             }
         }
 
