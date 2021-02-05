@@ -60,17 +60,20 @@ namespace webglEngine
         private static onKeyDown(event:KeyboardEvent):boolean
         {
             InputManager._keys[event.keyCode] = true;
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
+            return true;
+            // should be used for production mode
+            //event.preventDefault();
+            //event.stopPropagation();
+            //return false;
         }
 
         private static onKeyUp(event:KeyboardEvent):boolean
         {
             InputManager._keys[event.keyCode] = false;
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
+            return true;
+            //event.preventDefault();
+            //event.stopPropagation();
+            //return false;
         }
 
         private static onMouseMove(event:MouseEvent):void

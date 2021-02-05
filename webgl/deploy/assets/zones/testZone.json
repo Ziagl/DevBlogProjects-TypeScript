@@ -69,7 +69,11 @@
                 {
                     "name":"test",
                     "materialName":"smiley",
-                    "type":"sprite"
+                    "type":"sprite",
+                    "origin":{
+                        "x":0.5,
+                        "y":0.5
+                    }
                 }
             ],
             "behaviors":[

@@ -69,6 +69,39 @@ namespace webglEngine
         }
 
         /**
+         * sets Vector3 koordinates
+         * @param x optional x value
+         * @param y optional y value
+         * @param z optional z value
+         */
+        public set(x?:number, y?:number, z?:number):void
+        {
+            if(x !== undefined)
+            {
+                this._x = x;
+            }
+
+            if(y !== undefined)
+            {
+                this._y = y;
+            }
+
+            if(z !== undefined)
+            {
+                this._z = z;
+            }
+        }
+
+        /**
+         * compares Vector3 with given vector value by value if it is equal
+         * @param v vector to compare
+         */
+        public equals(v:Vector3):boolean
+        {
+            return (this.x===v.x && this.y===v.y && this.z===v.z);
+        }
+
+        /**
          * converts this vector into an array of numbers
          */
         public toArray():number[]
