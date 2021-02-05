@@ -1,6 +1,6 @@
 namespace webglEngine
 {
-    export class Engine
+    export class Engine implements IMessageHandler
     {
         private _canvas:HTMLCanvasElement;
         private _basicShader:BasicShader;
@@ -15,7 +15,10 @@ namespace webglEngine
         {
             this._canvas = GLUtilities.initialize();
             AssetManager.initialize();
+            InputManager.initialize();
             ZoneManager.initialize();
+            
+            Message.subscribe("MOUSE_UP", this);
 
             // load shader
             this._basicShader = new BasicShader();
@@ -35,6 +38,15 @@ namespace webglEngine
             // enable transparancy
             gl.enable(gl.BLEND);    
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
+
+        public onMessage(message:Message):void 
+        {
+            if(message.code === "MOUSE_UP")
+            {
+                let context = message.context as MouseContext;
+                document.title = `Pos: [${context.position.x},${context.position.y}]`
+            }
         }
 
         /**
