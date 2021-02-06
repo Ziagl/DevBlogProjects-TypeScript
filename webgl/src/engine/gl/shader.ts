@@ -84,7 +84,7 @@ namespace webglEngine
 
             gl.shaderSource(shader, source);
             gl.compileShader(shader);
-            let error = gl.getShaderInfoLog(shader);
+            let error = gl.getShaderInfoLog(shader).trim();
             if(error !== "")
             {
                 throw new Error("Error compiling shader '"+this._name+"': "+error);
@@ -100,7 +100,7 @@ namespace webglEngine
             gl.attachShader(program, fragmentShader);
             gl.linkProgram(program);
 
-            let error = gl.getProgramInfoLog(program);
+            let error = gl.getProgramInfoLog(program).trim();
             if(error !== "")
             {
                 throw new Error("Error linking shader '"+this._name+"': "+error);

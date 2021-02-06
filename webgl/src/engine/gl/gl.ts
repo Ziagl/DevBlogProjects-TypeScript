@@ -35,9 +35,14 @@ namespace webglEngine
 
             // create WebGL rendering context
             gl = <WebGLRenderingContext> canvas.getContext("webgl");
-            if(gl === undefined )
+            if(gl === undefined || gl === null)
             {
-                throw new Error("Unable to initialize WebGL!");
+                // support for IE
+                gl = <WebGLRenderingContext> canvas.getContext("experimental-webgl");
+                if(gl === undefined || gl === null)
+                {
+                    throw new Error("Unable to initialize WebGL!");
+                }
             }
 
             return canvas;

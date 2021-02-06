@@ -80,6 +80,11 @@ namespace webglEngine
         public load():void
         {
             super.load();
+
+            if(!this._assetLoaded)
+            {
+                this.setupFromMaterial();
+            }
         }
 
         /**
@@ -90,6 +95,7 @@ namespace webglEngine
         {
             if(!this._assetLoaded)
             {
+                this.setupFromMaterial();
                 return;
             }
 
@@ -146,6 +152,27 @@ namespace webglEngine
                 let max:Vector2 = new Vector2(uMax,vMax);
 
                 this._frameUVs.push(new UVInfo(min,max));
+            }
+        }
+
+        private setupFromMaterial():void
+        {
+            if(!this._assetLoaded)
+            {
+                let material = MaterialManager.getMaterial(this._materialName);
+                if(material !== undefined)
+                {
+                    if(material.diffuseTexture.isLoaded)
+                    {
+                        if(AssetManager.isAssetLoaded(material.diffuseTextureName))
+                        {
+                            this._assetHeight = material.diffuseTexture.height;
+                            this._assetWidth = material.diffuseTexture.width;
+                            this._assetLoaded = true;
+                            this.calculateUVs();
+                        }
+                    }
+                }
             }
         }
     }
