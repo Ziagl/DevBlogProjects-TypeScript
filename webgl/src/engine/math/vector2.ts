@@ -56,6 +56,17 @@ namespace webglEngine
         }
 
         /**
+         * returns the distance of 2 Vector2
+         * @param a first Vector2
+         * @param b second Vector2
+         */
+        public static distance(a:Vector2, b:Vector2):number
+        {
+            let diff = a.clone().subtract(b);
+            return Math.sqrt(diff.x*diff.x + diff.y*diff.y);
+        }
+
+        /**
          * set data from another Vector2
          * @param v Vector to be copied
          */
@@ -63,6 +74,14 @@ namespace webglEngine
         {
             this._x = v.x;
             this._y = v.y;
+        }
+
+        /**
+         * clones this Vector2 and returns it
+         */
+        public clone():Vector2
+        {
+            return new Vector2(this._x, this._y);
         }
 
         /**
@@ -91,6 +110,38 @@ namespace webglEngine
             {
                 this._y = Number(json.y);
             }
+        }
+
+        public add(v:Vector2):Vector2
+        {
+            this._x += v._x;
+            this._y += v._y;
+
+            return this;
+        }
+
+        public subtract(v:Vector2):Vector2
+        {
+            this._x -= v._x;
+            this._y -= v._y;
+
+            return this;
+        }
+
+        public multiply(v:Vector2):Vector2
+        {
+            this._x *= v._x;
+            this._y *= v._y;
+
+            return this;
+        }
+
+        public devide(v:Vector2):Vector2
+        {
+            this._x /= v._x;
+            this._y /= v._y;
+
+            return this;
         }
     }
 }

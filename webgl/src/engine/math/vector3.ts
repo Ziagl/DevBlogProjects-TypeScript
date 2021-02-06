@@ -69,6 +69,17 @@ namespace webglEngine
         }
 
         /**
+         * returns the distance of 2 Vector2
+         * @param a first Vector2
+         * @param b second Vector2
+         */
+        public static distance(a:Vector3, b:Vector3):number
+        {
+            let diff = a.clone().subtract(b);
+            return Math.sqrt(diff.x*diff.x + diff.y*diff.y + diff.z*diff.z);
+        }
+
+        /**
          * sets Vector3 koordinates
          * @param x optional x value
          * @param y optional y value
@@ -128,6 +139,14 @@ namespace webglEngine
             this._z = vector.z;
         }
 
+        /**
+         * clones this Vector3 and returns it
+         */
+        public clone():Vector3
+        {
+            return new Vector3(this._x, this._y, this._z);
+        }
+
         public setFromJson(json:any):void
         {
             if(json.x !== undefined)
@@ -178,6 +197,11 @@ namespace webglEngine
             this._z /= v._z;
 
             return this;
+        }
+
+        public toVector2():Vector2
+        {
+            return new Vector2(this._x, this._y);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace webglEngine
                 let context = message.context as MouseContext;
                 document.title = `Pos: [${context.position.x},${context.position.y}]`
 
-                AudioManager.playSound("laugh");
+                //AudioManager.playSound("laugh");
             }
         }
 
@@ -84,6 +84,7 @@ namespace webglEngine
             let delta = performance.now() - this._previousTime;
             MessageBus.update(delta);
             ZoneManager.update(delta);
+            CollisionManager.update(delta);
             this._previousTime = performance.now();
 
             // logic that decides if we need to redraw canvas

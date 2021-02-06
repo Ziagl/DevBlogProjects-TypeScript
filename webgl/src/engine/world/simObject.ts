@@ -153,6 +153,11 @@ namespace webglEngine
             }
         }
 
+        /** Returns the world position of this entity. */
+        public getWorldPosition(): Vector3 {
+            return new Vector3( this._worldMatrix.data[12], this._worldMatrix.data[13], this._worldMatrix.data[14] );
+        }
+
         protected onAdded(scene:Scene):void
         {
             this._scene = scene;

@@ -31,7 +31,11 @@
                     "shape": {
                         "type":"rectangle",
                         "width":108,
-                        "height":140
+                        "height":140,
+                        "offset":{
+                            "x":-54,
+                            "y":-70
+                        }
                     }
                 }
             ],
@@ -51,6 +55,33 @@
                     "y":300
                 }
             },
+            "children":[
+                {
+                    "name":"testObject",
+                    "transform": {
+                        "position":{
+                            "x":120,
+                            "y":120
+                        }
+                    },
+                    "components":[
+                        {
+                            "name":"test",
+                            "materialName":"smiley",
+                            "type":"sprite"
+                        }
+                    ],
+                    "behaviors":[
+                        {
+                            "name":"rotateX",
+                            "type":"rotation",
+                            "rotation":{
+                                "z":0.01
+                            }
+                        }
+                    ]
+                }
+            ],
             "components":[
                 {
                     "name":"test",
@@ -66,7 +97,11 @@
                     "type":"collision",
                     "shape":{
                         "type":"circle",
-                        "radius":50
+                        "radius":50,
+                        "offset":{
+                            "x":50,
+                            "y":50
+                        }
                     }
                 }
             ]
